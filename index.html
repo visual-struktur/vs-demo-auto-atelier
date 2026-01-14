@@ -200,11 +200,12 @@
 
 <body class="min-h-screen">
     <!-- NAV -->
-    <nav class="fixed top-0 w-full z-50 nav-shell">
-        <div class="container-xl">
-            <!-- ✅ Correct layout: left | center | right -->
-            <div class="h-16 flex items-center">
-                <!-- LEFT: Brand -->
+<nav class="fixed top-0 w-full z-50 nav-shell">
+    <div class="container-xl">
+        <div class="h-16 flex items-center justify-between">
+            <!-- LEFT GROUP: logo + desktop links -->
+            <div class="flex items-center gap-10 min-w-0">
+                <!-- Brand -->
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="w-10 h-10 rounded-xl grid place-items-center"
                         style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);">
@@ -223,52 +224,51 @@
                     </div>
                 </div>
 
-                <!-- CENTER: Desktop Nav -->
-                <div class="hidden md:flex flex-1 items-center justify-center">
-                    <ul class="flex items-center gap-8 text-sm" style="color: var(--muted);">
-                        <li><a href="#leistungen" class="hover:text-white transition-colors">Leistungen</a></li>
-                        <li><a href="#ueber-uns" class="hover:text-white transition-colors">Über uns</a></li>
-                        <li><a href="#preise" class="hover:text-white transition-colors">Preise</a></li>
-                        <li><a href="#kontakt" class="hover:text-white transition-colors">Kontakt</a></li>
-                    </ul>
-                </div>
-
-                <!-- RIGHT: CTA + Burger -->
-                <div class="ml-auto flex items-center gap-3 shrink-0">
-                    <a href="#kontakt"
-                        class="hidden sm:inline-flex btn-primary px-5 py-2.5 rounded-xl text-white text-sm font-medium">
-                        <span id="cta-primary">Termin anfragen</span>
-                    </a>
-
-                    <button id="mobile-menu-btn"
-                        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl btn-secondary"
-                        aria-label="Menü öffnen" aria-controls="mobile-menu" aria-expanded="false">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+                <!-- Desktop links (NOW LEFT, not centered) -->
+                <div class="hidden md:flex items-center gap-8 text-sm whitespace-nowrap" style="color: var(--muted);">
+                    <a href="#leistungen" class="hover:text-white transition-colors">Leistungen</a>
+                    <a href="#ueber-uns" class="hover:text-white transition-colors">Über uns</a>
+                    <a href="#preise" class="hover:text-white transition-colors">Preise</a>
+                    <a href="#kontakt" class="hover:text-white transition-colors">Kontakt</a>
                 </div>
             </div>
-        </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/70"></div>
+            <!-- RIGHT GROUP -->
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="#kontakt"
+                    class="hidden sm:inline-flex btn-primary px-5 py-2.5 rounded-xl text-white text-sm font-medium">
+                    <span id="cta-primary">Termin anfragen</span>
+                </a>
 
-            <div class="absolute top-16 left-0 right-0 glass border-t border-white/10 z-50">
-                <div class="container-xl py-6 space-y-3 text-left">
-                    <a href="#leistungen" class="block py-2" style="color: var(--muted);">Leistungen</a>
-                    <a href="#ueber-uns" class="block py-2" style="color: var(--muted);">Über uns</a>
-                    <a href="#preise" class="block py-2" style="color: var(--muted);">Preise</a>
-                    <a href="#kontakt" class="block py-2" style="color: var(--muted);">Kontakt</a>
-                    <a href="#kontakt" class="block btn-primary px-5 py-3 rounded-xl text-white text-center mt-2">Termin
-                        anfragen</a>
-                </div>
+                <button id="mobile-menu-btn"
+                    class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl btn-secondary"
+                    aria-label="Menü öffnen" aria-controls="mobile-menu" aria-expanded="false">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Mobile Menu (оставь как было) -->
+    <div id="mobile-menu" class="hidden md:hidden">
+        <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/70"></div>
+        <div class="absolute top-16 left-0 right-0 glass border-t border-white/10 z-50">
+            <div class="container-xl py-6 space-y-3 text-left">
+                <a href="#leistungen" class="block py-2" style="color: var(--muted);">Leistungen</a>
+                <a href="#ueber-uns" class="block py-2" style="color: var(--muted);">Über uns</a>
+                <a href="#preise" class="block py-2" style="color: var(--muted);">Preise</a>
+                <a href="#kontakt" class="block py-2" style="color: var(--muted);">Kontakt</a>
+                <a href="#kontakt" class="block btn-primary px-5 py-3 rounded-xl text-white text-center mt-2">Termin
+                    anfragen</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 
     <main id="main">
         <!-- HERO -->
