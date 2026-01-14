@@ -1,8 +1,9 @@
 /* ==========================================================================
    Auto Atelier Demo — app.js (stable for GitHub Pages)
-   - Fixes: mobile menu open/close (overlay), smooth scroll closes menu
+   - Mobile menu: open/close with overlay, click-outside, ESC, link click
+   - Smooth scroll: closes menu first, then scrollIntoView
    - Sets year + binds config texts
-   - NOTE: No backend; submit shows demo message (no fake success)
+   - Contact form: demo mode (no backend) -> toast error
    ========================================================================== */
 
 const defaultConfig = {
@@ -16,8 +17,6 @@ const defaultConfig = {
     contact_email: "info@auto-atelier.de",
     contact_address: "Musterstraße 12, 31785 Hameln",
 };
-
-let recordCount = 0;
 
 function qs(sel, root) {
     return (root || document).querySelector(sel);
@@ -57,7 +56,9 @@ function showToast(message, type = "success") {
         "</span>";
 
     container.appendChild(toast);
-    window.setTimeout(() => toast.remove(), 3200);
+    window.setTimeout(() => {
+        try { toast.remove(); } catch (_) { }
+    }, 3200);
 }
 
 /** Bind config -> DOM */
@@ -88,23 +89,29 @@ function initMobileMenu() {
     const btn = qs("#mobile-menu-btn");
     const menu = qs("#mobile-menu");
     const overlay = qs("#mobile-menu-overlay");
+
+    // Panel: der Bereich, der NICHT Overlay ist (dein "absolute top-16 ...")
+    const panel = menu ? qs(".glass", menu) : null;
+
     if (!btn || !menu || !overlay) return null;
 
-    const panel = overlay.nextElementSibling;
-
     function lockScroll(lock) {
-        document.documentElement.classList.toggle("overflow-hidden", !!lock);
-        document.body.classList.toggle("overflow-hidden", !!lock);
+        const on = !!lock;
+        document.documentElement.classList.toggle("overflow-hidden", on);
+        document.body.classList.toggle("overflow-hidden", on);
     }
+
     function isOpen() {
         return !menu.classList.contains("hidden");
     }
+
     function openMenu() {
         if (isOpen()) return;
         menu.classList.remove("hidden");
         btn.setAttribute("aria-expanded", "true");
         lockScroll(true);
     }
+
     function closeMenu() {
         if (!isOpen()) return;
         menu.classList.add("hidden");
@@ -115,13 +122,21 @@ function initMobileMenu() {
     btn.addEventListener("click", () => (isOpen() ? closeMenu() : openMenu()));
     overlay.addEventListener("click", closeMenu);
 
-    // click outside panel
-    document.addEventListener("mousedown", (e) => {
+    // Click outside panel (desktop + mobile)
+    function onOutside(e) {
         if (!isOpen()) return;
-        if (panel && panel.contains(e.target)) return;
-        if (btn.contains(e.target)) return;
+
+        const t = e && e.target ? e.target : null;
+        if (!t) return;
+
+        if (panel && panel.contains(t)) return; // click inside panel
+        if (btn.contains(t)) return;            // click on toggle button
+
         closeMenu();
-    });
+    }
+
+    document.addEventListener("mousedown", onOutside);
+    document.addEventListener("touchstart", onOutside, { passive: true });
 
     // ESC
     document.addEventListener("keydown", (e) => {
@@ -129,10 +144,10 @@ function initMobileMenu() {
         if (e.key === "Escape") closeMenu();
     });
 
-    // close on link click
-    qsa("a", menu).forEach((a) => a.addEventListener("click", closeMenu));
+    // close on link click inside menu
+    qsa('a[href^="#"]', menu).forEach((a) => a.addEventListener("click", closeMenu));
 
-    return { isOpen, closeMenu };
+    return { isOpen, closeMenu, openMenu };
 }
 
 /** Smooth scroll: close menu first */
@@ -142,12 +157,15 @@ function initSmoothScroll(mobileMenuApi) {
             const href = a.getAttribute("href");
             if (!href || href === "#") return;
 
+            // Nur echte IDs behandeln
             const target = qs(href);
             if (!target) return;
 
+            // Wichtig: Nur dann preventDefault, wenn wir wirklich scrollen
+            e.preventDefault();
+
             if (mobileMenuApi && mobileMenuApi.isOpen()) mobileMenuApi.closeMenu();
 
-            e.preventDefault();
             target.scrollIntoView({ behavior: "smooth", block: "start" });
         });
     });
@@ -160,10 +178,14 @@ function initContactForm() {
     const submitBtn = qs("#submit-btn");
     const newRequestBtn = qs("#new-request-btn");
 
-    if (!contactForm || !formSuccess || !submitBtn || !newRequestBtn) return;
+    // In deinem aktuellen HTML ist formSuccess zwar vorhanden,
+    // aber du wolltest "no fake success" -> wir zeigen NICHT success an.
+    // Trotzdem lassen wir die Elemente drin (falls du später umstellst).
+    if (!contactForm || !submitBtn) return;
 
     function setSubmitState(loading) {
         submitBtn.disabled = !!loading;
+
         if (loading) {
             submitBtn.innerHTML =
                 '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">' +
@@ -182,16 +204,11 @@ function initContactForm() {
     contactForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        if (recordCount >= 999) {
-            showToast("Maximale Anzahl an Anfragen erreicht.", "error");
-            return;
-        }
-
         setSubmitState(true);
 
         try {
             // Demo: no backend
-            await new Promise((r) => setTimeout(r, 400));
+            await new Promise((r) => setTimeout(r, 350));
             throw new Error("No backend configured");
         } catch (err) {
             showToast("Demo: Keine Versand-Integration aktiv. Bitte E-Mail/Backend anbinden.", "error");
@@ -200,20 +217,26 @@ function initContactForm() {
         }
     });
 
-    newRequestBtn.addEventListener("click", () => {
-        contactForm.reset();
-        contactForm.classList.remove("hidden");
-        formSuccess.classList.add("hidden");
-    });
+    // Optional: wenn du später doch success block nutzt
+    if (newRequestBtn && formSuccess) {
+        newRequestBtn.addEventListener("click", () => {
+            contactForm.reset();
+            contactForm.classList.remove("hidden");
+            formSuccess.classList.add("hidden");
+        });
+    }
 }
 
 /** Init */
 document.addEventListener("DOMContentLoaded", () => {
+    // year
     const y = qs("#year");
     if (y) y.textContent = String(new Date().getFullYear());
 
+    // texts
     onConfigChange(defaultConfig);
 
+    // menus / scroll / form
     const mobileMenuApi = initMobileMenu();
     initSmoothScroll(mobileMenuApi);
     initContactForm();
